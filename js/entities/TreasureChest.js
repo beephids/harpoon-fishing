@@ -1,14 +1,16 @@
 import { CONFIG } from '../data/config.js';
-import { TREASURE_ITEMS } from '../data/creatureData.js';
+import { CREATURE_TYPES, TREASURE_ITEMS } from '../data/creatureData.js';
+import { Animator } from '../rendering/Animator.js';
 import { randomRange, randomInt } from '../utils/math.js';
 
 // Treasure item entity (similar to SeaCreature but for treasure)
 class TreasureItem {
-    constructor(x, y, treasureData, spriteSheet) {
+    constructor(x, y, treasureData, spriteSheet, creatureSheet) {
         this.x = x;
         this.y = y;
         this.renderY = y;
         this.spriteSheet = spriteSheet;
+        this.creatureSheet = creatureSheet;
         this.alive = true;
 
         // Copy treasure data
@@ -28,11 +30,31 @@ class TreasureItem {
         // Animation
         this.bobPhase = Math.random() * Math.PI * 2;
         this.sparkleTimer = 0;
+
+        // Tubeworm ring
+        this.tubewormRingEnabled = Boolean(CONFIG.TREASURE_TUBEWORM_RING_ENABLED && this.creatureSheet);
+        if (this.tubewormRingEnabled && CREATURE_TYPES.tubeworm) {
+            this.tubewormRing = {
+                count: 6,
+                radius: 90,
+                size: 86,
+                angle: Math.random() * Math.PI * 2,
+                speed: 0.35,
+                animator: new Animator(CREATURE_TYPES.tubeworm.frames, 3),
+            };
+        } else {
+            this.tubewormRingEnabled = false;
+            this.tubewormRing = null;
+        }
     }
 
     update(dt) {
         this.bobPhase += dt * 2;
         this.sparkleTimer += dt;
+        if (this.tubewormRingEnabled && this.tubewormRing) {
+            this.tubewormRing.angle += dt * this.tubewormRing.speed;
+            this.tubewormRing.animator.update(dt);
+        }
     }
 
     render(ctx) {
@@ -40,6 +62,7 @@ class TreasureItem {
 
         const bobOffset = Math.sin(this.bobPhase) * 5;
         const half = this.displaySize / 2;
+        const centerY = this.renderY + bobOffset;
 
         ctx.save();
 
@@ -48,9 +71,28 @@ class TreasureItem {
             ctx.globalAlpha = 0.3;
             ctx.fillStyle = '#FFD700';
             ctx.beginPath();
-            ctx.arc(this.x, this.renderY + bobOffset, this.displaySize * 0.6, 0, Math.PI * 2);
+            ctx.arc(this.x, centerY, this.displaySize * 0.6, 0, Math.PI * 2);
             ctx.fill();
             ctx.globalAlpha = 1;
+        }
+
+        // Tubeworm ring
+        if (this.tubewormRingEnabled && this.tubewormRing &&
+            this.creatureSheet && this.creatureSheet.loaded) {
+            const frame = this.tubewormRing.animator.getCurrentFrame();
+            const ringHalf = this.tubewormRing.size / 2;
+            for (let i = 0; i < this.tubewormRing.count; i++) {
+                const angle = this.tubewormRing.angle +
+                    (Math.PI * 2 * i) / this.tubewormRing.count;
+                const rx = this.x + Math.cos(angle) * this.tubewormRing.radius;
+                const ry = centerY + Math.sin(angle) * this.tubewormRing.radius;
+                this.creatureSheet.drawFrame(
+                    ctx,
+                    frame.sx, frame.sy, frame.sw, frame.sh,
+                    rx - ringHalf, ry - ringHalf,
+                    this.tubewormRing.size, this.tubewormRing.size
+                );
+            }
         }
 
         // Draw treasure sprite
@@ -58,7 +100,7 @@ class TreasureItem {
             this.spriteSheet.drawFrame(
                 ctx,
                 this.frame.sx, this.frame.sy, this.frame.sw, this.frame.sh,
-                this.x - half, this.renderY + bobOffset - half,
+                this.x - half, centerY - half,
                 this.displaySize, this.displaySize
             );
         }
@@ -73,8 +115,9 @@ class TreasureItem {
 
 // States: closed, opening, open, retreating, closing
 export class TreasureChest {
-    constructor(treasureSpriteSheet) {
+    constructor(treasureSpriteSheet, creatureSpriteSheet) {
         this.treasureSheet = treasureSpriteSheet;
+        this.creatureSheet = creatureSpriteSheet;
         this.x = CONFIG.CHEST_X;
         this.y = CONFIG.CHEST_Y;
 
@@ -92,7 +135,7 @@ export class TreasureChest {
         // The treasure item that appears from the chest
         this.spawnedTreasure = null;
         this.treasureRiseOffset = 0;
-        this.treasureMaxRise = 80;
+        this.treasureMaxRise = 0; // keep treasure at spawn position for fair 2P play
         this.retreatProgress = 0;
 
         this.glowPhase = 0;
@@ -128,7 +171,8 @@ export class TreasureChest {
                         this.x,
                         this.y,
                         treasureData,
-                        this.treasureSheet
+                        this.treasureSheet,
+                        this.creatureSheet
                     );
                     // Add to global creatures array so harpoon can hit it
                     creatures.push(this.spawnedTreasure);
@@ -137,7 +181,7 @@ export class TreasureChest {
 
             case 'open':
                 this.timer += dt;
-                // Rise the treasure upward out of the chest
+                // Keep the treasure at its spawn position (no rise)
                 if (this.treasureRiseOffset < this.treasureMaxRise) {
                     this.treasureRiseOffset += 60 * dt;
                     if (this.treasureRiseOffset > this.treasureMaxRise) {

@@ -79,9 +79,14 @@ export class UIRenderer {
             this._updatePlayerAnim(this.p2, dt, targetScore2);
         } else {
             // Legacy single-player update
-            if (this.displayScore < targetScore1) {
-                this.displayScore += Math.ceil((targetScore1 - this.displayScore) * 8 * dt);
-                if (this.displayScore > targetScore1) this.displayScore = targetScore1;
+            const delta = targetScore1 - this.displayScore;
+            if (delta !== 0) {
+                const step = Math.ceil(Math.abs(delta) * 8 * dt);
+                this.displayScore += Math.sign(delta) * step;
+                if ((delta > 0 && this.displayScore > targetScore1) ||
+                    (delta < 0 && this.displayScore < targetScore1)) {
+                    this.displayScore = targetScore1;
+                }
             }
             if (this.harpoonBounce > 0) this.harpoonBounce -= dt;
             if (this.scorePop > 0) this.scorePop -= dt;
@@ -97,9 +102,14 @@ export class UIRenderer {
     }
 
     _updatePlayerAnim(player, dt, targetScore) {
-        if (player.displayScore < targetScore) {
-            player.displayScore += Math.ceil((targetScore - player.displayScore) * 8 * dt);
-            if (player.displayScore > targetScore) player.displayScore = targetScore;
+        const delta = targetScore - player.displayScore;
+        if (delta !== 0) {
+            const step = Math.ceil(Math.abs(delta) * 8 * dt);
+            player.displayScore += Math.sign(delta) * step;
+            if ((delta > 0 && player.displayScore > targetScore) ||
+                (delta < 0 && player.displayScore < targetScore)) {
+                player.displayScore = targetScore;
+            }
         }
         if (player.harpoonBounce > 0) player.harpoonBounce -= dt;
         if (player.scorePop > 0) player.scorePop -= dt;
@@ -152,7 +162,7 @@ export class UIRenderer {
 
         // Shot timer bar (top center)
         if (shotTimer >= 0) {
-            this._renderShotTimer(ctx, shotTimer, CONFIG.DESIGN_WIDTH / 2, 30);
+            this._renderShotTimer(ctx, shotTimer, CONFIG.DESIGN_WIDTH / 2, 80);
         }
     }
 
@@ -249,27 +259,68 @@ export class UIRenderer {
             this._renderShotTimer(ctx, p1ShotTimer, cx, CONFIG.DESIGN_HEIGHT - 90, 200, '#3498db');
         }
 
-        // Center divider line (subtle)
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-        ctx.lineWidth = 2;
-        ctx.setLineDash([20, 20]);
-        ctx.beginPath();
-        ctx.moveTo(0, CONFIG.DESIGN_HEIGHT / 2);
-        ctx.lineTo(CONFIG.DESIGN_WIDTH, CONFIG.DESIGN_HEIGHT / 2);
-        ctx.stroke();
-        ctx.setLineDash([]);
     }
 
     _drawHarpoonIcon(ctx, tintColor = null) {
-        ctx.fillStyle = tintColor || '#d4d4d4';
+        const metal = tintColor || '#d4d4d4';
+        const metalDark = '#9aa0a6';
+        const wood = '#8B5E3C';
+        const woodDark = '#6f452c';
+
+        ctx.save();
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+
+        // Metal tip
+        ctx.fillStyle = metal;
         ctx.beginPath();
-        ctx.moveTo(0, -10);
-        ctx.lineTo(-4, 4);
-        ctx.lineTo(4, 4);
+        ctx.moveTo(0, -14);
+        ctx.lineTo(-6, 6);
+        ctx.lineTo(6, 6);
         ctx.closePath();
         ctx.fill();
-        ctx.fillStyle = '#8B5E3C';
-        ctx.fillRect(-2, 4, 4, 14);
+
+        // Side barbs
+        ctx.fillStyle = metalDark;
+        ctx.beginPath();
+        ctx.moveTo(-6, 3);
+        ctx.lineTo(-11, 6);
+        ctx.lineTo(-6, 9);
+        ctx.closePath();
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(6, 3);
+        ctx.lineTo(11, 6);
+        ctx.lineTo(6, 9);
+        ctx.closePath();
+        ctx.fill();
+
+        // Neck/ferrule
+        ctx.fillStyle = metalDark;
+        ctx.fillRect(-4, 6, 8, 4);
+
+        // Shaft
+        ctx.fillStyle = wood;
+        ctx.fillRect(-3, 10, 6, 14);
+
+        // Grip wraps
+        ctx.fillStyle = woodDark;
+        ctx.fillRect(-3, 13, 6, 2);
+        ctx.fillRect(-3, 18, 6, 2);
+
+        // Bottom cap
+        ctx.fillStyle = woodDark;
+        ctx.fillRect(-4, 24, 8, 3);
+
+        // Highlight on tip
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(0, -12);
+        ctx.lineTo(0, 6);
+        ctx.stroke();
+
+        ctx.restore();
     }
 
     _renderShotTimer(ctx, shotTimer, centerX, y, barWidth = 400, fillColor = '#3498db') {
@@ -337,13 +388,13 @@ export class UIRenderer {
         const minutes = Math.floor(totalSeconds / 60);
         const seconds = totalSeconds % 60;
         const display = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        const cx = CONFIG.DESIGN_WIDTH / 2;
+        const cx = this.isTwoPlayer ? CONFIG.DESIGN_WIDTH - 150 : CONFIG.DESIGN_WIDTH / 2;
         const isWarning = roundTimer <= 30;
         const isCritical = roundTimer <= 10;
 
         ctx.save();
         ctx.textAlign = 'center';
-        ctx.font = 'bold 32px monospace';
+        ctx.font = 'bold 42px monospace';
 
         if (isCritical) {
             const pulse = Math.sin(Date.now() * 0.01) * 0.5 + 0.5;
@@ -355,7 +406,7 @@ export class UIRenderer {
             ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
         }
 
-        const y = this.isTwoPlayer ? CONFIG.DESIGN_HEIGHT / 2 + 8 : 20;
+        const y = this.isTwoPlayer ? CONFIG.DESIGN_HEIGHT / 2 + 8 : 56;
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 3;
         ctx.strokeText(display, cx, y);

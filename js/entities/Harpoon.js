@@ -124,22 +124,13 @@ export class Harpoon {
             ctx.lineTo(this.tipX, this.tipY);
             ctx.stroke();
 
-            // Harpoon head (arrow triangle)
+            // Harpoon head (detailed)
             ctx.save();
             ctx.translate(this.tipX, this.tipY);
             // Rotate based on direction - flip for player 2
             ctx.rotate(this.angle * (this.direction === 1 ? -1 : 1));
             if (this.direction === 1) ctx.scale(1, -1);
-            ctx.fillStyle = '#d4d4d4';
-            ctx.strokeStyle = '#666666';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(0, -18);
-            ctx.lineTo(-7, 6);
-            ctx.lineTo(7, 6);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
+            this._drawHarpoonHead(ctx, true);
             ctx.restore();
         }
 
@@ -152,24 +143,163 @@ export class Harpoon {
         if (this.direction === 1) ctx.scale(1, -1);
 
         // Launcher body
-        ctx.fillStyle = '#8B5E3C';
-        ctx.fillRect(-8, -35, 16, 40);
-        ctx.strokeStyle = '#5C3A1E';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(-8, -35, 16, 40);
+        const launcherScale = 1.5;
+        ctx.save();
+        ctx.scale(launcherScale, launcherScale);
+        this._drawBallistaLauncher(ctx);
+        ctx.restore();
 
         // Harpoon tip (when idle / ready to fire)
         if (this.state === 'idle') {
-            ctx.fillStyle = '#d4d4d4';
-            ctx.beginPath();
-            ctx.moveTo(0, -50);
-            ctx.lineTo(-7, -30);
-            ctx.lineTo(7, -30);
-            ctx.closePath();
-            ctx.fill();
-            ctx.strokeStyle = '#666666';
-            ctx.stroke();
+            ctx.save();
+            ctx.translate(0, -30 * launcherScale);
+            this._drawHarpoonHead(ctx, false);
+            ctx.restore();
         }
+
+        ctx.restore();
+    }
+
+    _drawHarpoonHead(ctx, withShaft = true) {
+        const metal = '#d4d4d4';
+        const metalDark = '#9aa0a6';
+        const wood = '#8B5E3C';
+        const woodDark = '#6f452c';
+        const scale = 1.25;
+
+        ctx.save();
+        ctx.scale(scale, scale);
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+
+        // Metal tip (base at y=0)
+        ctx.fillStyle = metal;
+        ctx.beginPath();
+        ctx.moveTo(0, -20);
+        ctx.lineTo(-6, 0);
+        ctx.lineTo(6, 0);
+        ctx.closePath();
+        ctx.fill();
+
+        // Side barbs
+        ctx.fillStyle = metalDark;
+        ctx.beginPath();
+        ctx.moveTo(-6, -3);
+        ctx.lineTo(-11, 0);
+        ctx.lineTo(-6, 3);
+        ctx.closePath();
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(6, -3);
+        ctx.lineTo(11, 0);
+        ctx.lineTo(6, 3);
+        ctx.closePath();
+        ctx.fill();
+
+        // Neck/ferrule
+        ctx.fillStyle = metalDark;
+        ctx.fillRect(-4, 0, 8, 4);
+
+        if (withShaft) {
+            // Shaft
+            ctx.fillStyle = wood;
+            ctx.fillRect(-3, 4, 6, 14);
+
+            // Grip wraps
+            ctx.fillStyle = woodDark;
+            ctx.fillRect(-3, 7, 6, 2);
+            ctx.fillRect(-3, 12, 6, 2);
+
+            // Bottom cap
+            ctx.fillRect(-4, 18, 8, 3);
+        }
+
+        // Highlight on tip
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(0, -18);
+        ctx.lineTo(0, 0);
+        ctx.stroke();
+
+        ctx.restore();
+    }
+
+    _drawBallistaLauncher(ctx) {
+        const wood = '#8B5E3C';
+        const woodDark = '#6f452c';
+        const metal = '#b0b6bb';
+        const metalDark = '#7d868c';
+        const stringColor = 'rgba(255, 255, 255, 0.6)';
+
+        ctx.save();
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+
+        // Stock
+        ctx.fillStyle = wood;
+        ctx.fillRect(-6, -34, 12, 40);
+        ctx.strokeStyle = woodDark;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(-6, -34, 12, 40);
+
+        // Base plate
+        ctx.fillStyle = woodDark;
+        ctx.fillRect(-12, 2, 24, 8);
+
+        // Crossbeam (metal)
+        ctx.fillStyle = metalDark;
+        ctx.fillRect(-10, -32, 20, 4);
+
+        // Left arm
+        ctx.fillStyle = wood;
+        ctx.beginPath();
+        ctx.moveTo(-6, -30);
+        ctx.lineTo(-22, -38);
+        ctx.lineTo(-20, -32);
+        ctx.lineTo(-6, -24);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = woodDark;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Right arm
+        ctx.beginPath();
+        ctx.moveTo(6, -30);
+        ctx.lineTo(22, -38);
+        ctx.lineTo(20, -32);
+        ctx.lineTo(6, -24);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // Metal tips on arms
+        ctx.fillStyle = metal;
+        ctx.beginPath();
+        ctx.moveTo(-22, -38);
+        ctx.lineTo(-26, -36);
+        ctx.lineTo(-21, -34);
+        ctx.closePath();
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(22, -38);
+        ctx.lineTo(26, -36);
+        ctx.lineTo(21, -34);
+        ctx.closePath();
+        ctx.fill();
+
+        // String
+        ctx.strokeStyle = stringColor;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(-24, -36);
+        ctx.lineTo(24, -36);
+        ctx.stroke();
+
+        // Trigger block
+        ctx.fillStyle = woodDark;
+        ctx.fillRect(-4, -6, 8, 6);
 
         ctx.restore();
     }

@@ -48,10 +48,11 @@ export class PlayState {
                 shotTimerMax: 10,
                 shotTimerActive: false,
                 gameOver: false,
+                buybackPending: false,
             });
         }
 
-        this.treasureChest = new TreasureChest(this.treasureSheet);
+        this.treasureChest = new TreasureChest(this.treasureSheet, this.creatureSheet);
         this.creatures = [];
 
         // Global game over state
@@ -65,7 +66,19 @@ export class PlayState {
 
         // Buyback (2P only): spend points for more harpoons when shot timer expires
         this.buybackCost = 500;
-        this.buybackHarpoons = 5;
+        this.buybackHarpoons = 1;
+
+        // Buyback button bounds (set during render, checked during input)
+        // Each entry: { accept: {x,y,w,h}, reject: {x,y,w,h} }
+        this.buybackButtons = [null, null];
+
+        // Buyback pointer handler
+        this._onBuybackPointerDown = this._onBuybackPointerDown.bind(this);
+        game.canvas.addEventListener('pointerdown', this._onBuybackPointerDown, true);
+
+        // Dev key handler
+        this._onDevKeyDown = this._onDevKeyDown.bind(this);
+        window.addEventListener('keydown', this._onDevKeyDown);
     }
 
     enter() {
@@ -75,6 +88,7 @@ export class PlayState {
             player.shotTimer = player.shotTimerMax;
             player.shotTimerActive = false;
             player.gameOver = false;
+            player.buybackPending = false;
         }
         this.creatures = [];
         this.gameOverPending = false;
@@ -176,23 +190,16 @@ export class PlayState {
 
     _updatePlayer(playerIndex, dt) {
         const player = this.players[playerIndex];
-        if (player.gameOver) return;
+        if (player.gameOver || player.buybackPending) return;
 
         // Shot timer countdown
         if (player.shotTimerActive && !this.gameOverPending) {
             player.shotTimer -= dt;
             if (player.shotTimer <= 0) {
                 player.shotTimer = 0;
-                if (this.isTwoPlayer) {
-                    const otherPlayer = this.players[1 - playerIndex];
-                    if (!otherPlayer.gameOver && player.scoreManager.score >= this.buybackCost) {
-                        player.scoreManager.score -= this.buybackCost;
-                        player.scoreManager.harpoonsRemaining += this.buybackHarpoons;
-                        player.shotTimer = player.shotTimerMax;
-                        this.uiRenderer.addHarpoonBounce(playerIndex);
-                    } else {
-                        player.gameOver = true;
-                    }
+                if (this.isTwoPlayer && player.scoreManager.score >= this.buybackCost) {
+                    // Show buyback prompt instead of auto-buying
+                    player.buybackPending = true;
                 } else {
                     player.gameOver = true;
                 }
@@ -264,11 +271,11 @@ export class PlayState {
         if (this.gameOverPending) return;
 
         if (this.isTwoPlayer) {
-            // In 2 player mode, game ends when both players are out
-            const p1Done = this.players[0].gameOver ||
-                (this.players[0].scoreManager.isGameOver && this.players[0].harpoon.state === 'idle');
-            const p2Done = this.players[1].gameOver ||
-                (this.players[1].scoreManager.isGameOver && this.players[1].harpoon.state === 'idle');
+            // In 2 player mode, game ends when both players are out (not just pending buyback)
+            const p1Done = !this.players[0].buybackPending && (this.players[0].gameOver ||
+                (this.players[0].scoreManager.isGameOver && this.players[0].harpoon.state === 'idle'));
+            const p2Done = !this.players[1].buybackPending && (this.players[1].gameOver ||
+                (this.players[1].scoreManager.isGameOver && this.players[1].harpoon.state === 'idle'));
 
             if (p1Done && p2Done) {
                 this.gameOverPending = true;
@@ -294,6 +301,21 @@ export class PlayState {
 
     render(ctx, alpha) {
         this.waterRenderer.render(ctx);
+
+        // Center divider line behind all sprites (2P only)
+        if (this.isTwoPlayer) {
+            ctx.save();
+            ctx.strokeStyle = 'rgba(255, 255, 0, 0.5)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([20, 20]);
+            ctx.beginPath();
+            ctx.moveTo(0, CONFIG.DESIGN_HEIGHT / 2);
+            ctx.lineTo(CONFIG.DESIGN_WIDTH, CONFIG.DESIGN_HEIGHT / 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.restore();
+        }
+
         this.treasureChest.render(ctx);
 
         // Draw creatures
@@ -337,6 +359,15 @@ export class PlayState {
             );
         }
 
+        // Buyback prompts (2P only)
+        if (this.isTwoPlayer) {
+            for (let i = 0; i < this.players.length; i++) {
+                if (this.players[i].buybackPending) {
+                    this._renderBuybackPrompt(ctx, i);
+                }
+            }
+        }
+
         // Game over overlay
         const allIdle = this.players.every(p => p.harpoon.state === 'idle');
         if (this.gameOverPending && allIdle) {
@@ -360,7 +391,114 @@ export class PlayState {
         }
     }
 
+    _renderBuybackPrompt(ctx, playerIndex) {
+        const cx = CONFIG.DESIGN_WIDTH / 2;
+        // P1 (bottom) prompt in lower quarter, P2 (top) prompt in upper quarter
+        const cy = playerIndex === 0
+            ? CONFIG.DESIGN_HEIGHT * 3 / 4
+            : CONFIG.DESIGN_HEIGHT * 1 / 4;
+
+        // Semi-transparent backdrop
+        ctx.save();
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        const bw = 460, bh = 100, br = 12;
+        const bx = cx - bw / 2, by = cy - bh / 2;
+        ctx.beginPath();
+        ctx.moveTo(bx + br, by);
+        ctx.lineTo(bx + bw - br, by);
+        ctx.quadraticCurveTo(bx + bw, by, bx + bw, by + br);
+        ctx.lineTo(bx + bw, by + bh - br);
+        ctx.quadraticCurveTo(bx + bw, by + bh, bx + bw - br, by + bh);
+        ctx.lineTo(bx + br, by + bh);
+        ctx.quadraticCurveTo(bx, by + bh, bx, by + bh - br);
+        ctx.lineTo(bx, by + br);
+        ctx.quadraticCurveTo(bx, by, bx + br, by);
+        ctx.closePath();
+        ctx.fill();
+
+        // Text: "500 pts = 5 harpoons"
+        ctx.font = 'bold 28px monospace';
+        ctx.textAlign = 'center';
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 3;
+        ctx.fillStyle = '#FFD700';
+        ctx.strokeText('500 pts = 1 harpoon + keep going!', cx, cy - 10);
+        ctx.fillText('500 pts = 1 harpoon + keep going!', cx, cy - 10);
+
+        // Accept and reject buttons using Silly Placeholders spritesheet
+        // Last row (row 9, y=144), last two columns: reject at col 8 (x=128), accept at col 9 (x=144)
+        const btnSize = 48;
+        const btnGap = 30;
+        const btnY = cy + 10;
+
+        // Reject button (red X) - left
+        const rejectX = cx - btnGap - btnSize;
+        this.sillySheet.drawFrame(ctx, 112, 176, 16, 16, rejectX, btnY, btnSize, btnSize);
+        this.buybackButtons[playerIndex] = this.buybackButtons[playerIndex] || {};
+        this.buybackButtons[playerIndex].reject = { x: rejectX, y: btnY, w: btnSize, h: btnSize };
+
+        // Accept button (green check) - right
+        const acceptX = cx + btnGap;
+        this.sillySheet.drawFrame(ctx, 128, 176, 16, 16, acceptX, btnY, btnSize, btnSize);
+        this.buybackButtons[playerIndex].accept = { x: acceptX, y: btnY, w: btnSize, h: btnSize };
+
+        ctx.restore();
+    }
+
+    _screenToCanvas(e) {
+        const rect = this.game.canvas.getBoundingClientRect();
+        const scaleX = this.game.canvas.width / rect.width;
+        const scaleY = this.game.canvas.height / rect.height;
+        return {
+            x: (e.clientX - rect.left) * scaleX,
+            y: (e.clientY - rect.top) * scaleY,
+        };
+    }
+
+    _hitTest(pos, bounds) {
+        return bounds && pos.x >= bounds.x && pos.x <= bounds.x + bounds.w
+            && pos.y >= bounds.y && pos.y <= bounds.y + bounds.h;
+    }
+
+    _onBuybackPointerDown(e) {
+        const pos = this._screenToCanvas(e);
+        for (let i = 0; i < this.players.length; i++) {
+            const player = this.players[i];
+            if (!player.buybackPending) continue;
+            const btns = this.buybackButtons[i];
+            if (!btns) continue;
+
+            if (this._hitTest(pos, btns.accept)) {
+                player.scoreManager.score -= this.buybackCost;
+                player.scoreManager.harpoonsRemaining += this.buybackHarpoons;
+                player.shotTimer = player.shotTimerMax;
+                player.buybackPending = false;
+                this.uiRenderer.addHarpoonBounce(i);
+                audio.playBonusHarpoon();
+                e.stopPropagation();
+                return;
+            }
+            if (this._hitTest(pos, btns.reject)) {
+                player.buybackPending = false;
+                player.gameOver = true;
+                e.stopPropagation();
+                return;
+            }
+        }
+    }
+
+    _onDevKeyDown(e) {
+        if (e.repeat) return;
+        if (e.key !== 'g' && e.key !== 'G') return;
+
+        for (const player of this.players) {
+            player.scoreManager.score += 500;
+        }
+    }
+
     exit() {
         this.input.destroy();
+        this.game.canvas.removeEventListener('pointerdown', this._onBuybackPointerDown, true);
+        window.removeEventListener('keydown', this._onDevKeyDown);
     }
 }
