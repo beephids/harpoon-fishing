@@ -1,9 +1,11 @@
 import { defineConfig } from 'vite';
 
-export default defineConfig(({ command }) => ({
-    root: '.',
-    publicDir: 'assets',
-    base: command === 'build' ? '/harpoon-fishing/' : '/',
+export default defineConfig(({ command }) => {
+    const repoName = process.env.GITHUB_REPOSITORY?.split('/')[1] || 'harpoon-fishing';
+    return {
+        root: '.',
+        publicDir: 'assets',
+        base: command === 'build' ? `/${repoName}/` : '/',
     build: {
         outDir: 'dist',
         assetsDir: 'assets',
@@ -12,4 +14,5 @@ export default defineConfig(({ command }) => ({
         port: 3000,
         open: true,
     },
-}));
+    };
+});
