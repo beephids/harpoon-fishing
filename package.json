@@ -1,7 +1,7 @@
 {
-  "name": "harpoon-game",
-  "version": "1.0.0",
-  "description": "Top-down harpoon fishing game",
+  "name": "harpoon-fishing",
+  "version": "1.0.5",
+  "description": "One to two players fish for treasure in a vibrant underwater world, using harpoons to snag deep sea creatures. Compete for the highest score in this fast-paced arcade-style game.",
   "type": "module",
   "scripts": {
     "dev": "vite",
