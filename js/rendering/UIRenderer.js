@@ -185,7 +185,7 @@ export class UIRenderer {
         // P2 Harpoon count (top-left)
         const p2Bounce = this.p2.harpoonBounce > 0 ? Math.sin(this.p2.harpoonBounce * 25) * 8 : 0;
         ctx.save();
-        ctx.translate(40, 70 + p2Bounce);
+        ctx.translate(40, 60 + p2Bounce);
         ctx.scale(1.5, 1.5);
         this._drawHarpoonIcon(ctx, '#e74c3c');
         ctx.font = 'bold 28px monospace';
@@ -200,7 +200,7 @@ export class UIRenderer {
         // P2 Score (top-right)
         const p2Scale = this.p2.scorePop > 0 ? 1 + this.p2.scorePop * 0.3 : 1;
         ctx.save();
-        ctx.translate(CONFIG.DESIGN_WIDTH - 40, 70);
+        ctx.translate(CONFIG.DESIGN_WIDTH - 40, 90);
         ctx.scale(p2Scale * 1.5, p2Scale * 1.5);
         ctx.font = 'bold 32px monospace';
         ctx.textAlign = 'right';
@@ -213,7 +213,7 @@ export class UIRenderer {
 
         // P2 Shot timer (smaller, near top)
         if (p2ShotTimer >= 0) {
-            this._renderShotTimer(ctx, p2ShotTimer, cx, 95, 300, '#e74c3c');
+            this._renderShotTimer(ctx, p2ShotTimer, 160, 460, 300, '#e74c3c');
         }
 
         // === PLAYER 1 (BOTTOM) ===
@@ -224,14 +224,14 @@ export class UIRenderer {
         ctx.fillStyle = '#3498db';
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 4;
-        ctx.strokeText('PLAYER 1', cx, CONFIG.DESIGN_HEIGHT - 60);
-        ctx.fillText('PLAYER 1', cx, CONFIG.DESIGN_HEIGHT - 60);
+        ctx.strokeText('PLAYER 1', cx, CONFIG.DESIGN_HEIGHT - 10);
+        ctx.fillText('PLAYER 1', cx, CONFIG.DESIGN_HEIGHT - 10);
         ctx.restore();
 
         // P1 Harpoon count (bottom-left)
         const p1Bounce = this.p1.harpoonBounce > 0 ? Math.sin(this.p1.harpoonBounce * 25) * 8 : 0;
         ctx.save();
-        ctx.translate(40, CONFIG.DESIGN_HEIGHT - 40 + p1Bounce);
+        ctx.translate(40, CONFIG.DESIGN_HEIGHT - 80 + p1Bounce);
         ctx.scale(1.5, 1.5);
         this._drawHarpoonIcon(ctx, '#3498db');
         ctx.font = 'bold 28px monospace';
@@ -246,7 +246,7 @@ export class UIRenderer {
         // P1 Score (bottom-right)
         const p1Scale = this.p1.scorePop > 0 ? 1 + this.p1.scorePop * 0.3 : 1;
         ctx.save();
-        ctx.translate(CONFIG.DESIGN_WIDTH - 40, CONFIG.DESIGN_HEIGHT - 40);
+        ctx.translate(CONFIG.DESIGN_WIDTH - 40, CONFIG.DESIGN_HEIGHT - 120);
         ctx.scale(p1Scale * 1.5, p1Scale * 1.5);
         ctx.font = 'bold 32px monospace';
         ctx.textAlign = 'right';
@@ -259,7 +259,7 @@ export class UIRenderer {
 
         // P1 Shot timer (smaller, near bottom)
         if (p1ShotTimer >= 0) {
-            this._renderShotTimer(ctx, p1ShotTimer, cx, CONFIG.DESIGN_HEIGHT - 105, 300, '#3498db');
+            this._renderShotTimer(ctx, p1ShotTimer, 160, CONFIG.DESIGN_HEIGHT - 480, 300, '#3498db');
         }
 
     }

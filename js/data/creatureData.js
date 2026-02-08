@@ -91,7 +91,7 @@ export const CREATURE_TYPES = {
         bonusHarpoons: 0,
         displaySize: 96,
         hitboxRadius: 26,
-        baseSpeed: 150,
+        baseSpeed: 100,
         name: 'Giant Isopod',
     },
     goblin_shark: {
@@ -101,7 +101,7 @@ export const CREATURE_TYPES = {
         bonusHarpoons: 0,
         displaySize: 128,
         hitboxRadius: 38,
-        baseSpeed: 300,
+        baseSpeed: 200,
         name: 'Goblin Shark',
     },
     gulper_eel: {
@@ -111,7 +111,7 @@ export const CREATURE_TYPES = {
         bonusHarpoons: 1,
         displaySize: 112,
         hitboxRadius: 34,
-        baseSpeed: 105,
+        baseSpeed: 205,
         name: 'Gulper Eel',
     },
     hatchetfish: {
@@ -137,7 +137,7 @@ export const CREATURE_TYPES = {
     tubeworm: {
         frames: frames(20),
         rarity: 'common',
-        points: 20,
+        points: 30,
         bonusHarpoons: 0,
         displaySize: 220,
         hitboxRadius: 80,
@@ -147,11 +147,11 @@ export const CREATURE_TYPES = {
     sea_spider: {
         frames: frames(15),
         rarity: 'common',
-        points: 10,
+        points: 20,
         bonusHarpoons: 0,
         displaySize: 128,
         hitboxRadius: 36,
-        baseSpeed: 330,
+        baseSpeed: 200,
         name: 'Sea Spider',
     },
     sea_toad: {
@@ -161,7 +161,7 @@ export const CREATURE_TYPES = {
         bonusHarpoons: 0,
         displaySize: 80,
         hitboxRadius: 21,
-        baseSpeed: 240,
+        baseSpeed: 200,
         name: 'Sea Toad',
     },
     siphonophore: {
@@ -181,7 +181,7 @@ export const CREATURE_TYPES = {
         bonusHarpoons: 0,
         displaySize: 96,
         hitboxRadius: 29,
-        baseSpeed: 90,
+        baseSpeed: 100,
         name: 'Spider Crab',
     },
     squat_lobster: {
@@ -201,7 +201,7 @@ export const CREATURE_TYPES = {
         bonusHarpoons: 0,
         displaySize: 96,
         hitboxRadius: 29,
-        baseSpeed: 225,
+        baseSpeed: 200,
         name: 'Vampire Squid',
     },
     vantafish: {
@@ -227,7 +227,7 @@ export const CREATURE_TYPES = {
     winged_comb_jelly: {
         frames: frames(11),
         rarity: 'common',
-        points: 10,
+        points: 20,
         bonusHarpoons: 0,
         displaySize: 96,
         hitboxRadius: 26,
