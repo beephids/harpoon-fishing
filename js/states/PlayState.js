@@ -359,7 +359,8 @@ export class PlayState {
             const isAiming = this.isTwoPlayer
                 ? this.input.isAiming(i)
                 : this.input.isAiming;
-            player.harpoon.render(ctx, aimAngle, isAiming);
+            const isTimerExpired = this.isTwoPlayer && player.shotTimer <= 0;
+            player.harpoon.render(ctx, aimAngle, isAiming, isTimerExpired);
         }
 
         // Particles on top
@@ -367,12 +368,18 @@ export class PlayState {
 
         // UI overlay
         if (this.isTwoPlayer) {
+            const p1ShotTimerDisplay = this.players[0].shotTimerActive
+                ? this.players[0].shotTimer
+                : (this.players[0].shotTimer <= 0 ? 0 : -1);
+            const p2ShotTimerDisplay = this.players[1].shotTimerActive
+                ? this.players[1].shotTimer
+                : (this.players[1].shotTimer <= 0 ? 0 : -1);
             this.uiRenderer.render(
                 ctx,
                 this.players[0].scoreManager.harpoonsRemaining,
-                this.players[0].shotTimerActive ? this.players[0].shotTimer : -1,
+                p1ShotTimerDisplay,
                 this.players[1].scoreManager.harpoonsRemaining,
-                this.players[1].shotTimerActive ? this.players[1].shotTimer : -1,
+                p2ShotTimerDisplay,
                 this.roundTimer
             );
         } else {
@@ -509,6 +516,7 @@ export class PlayState {
         player.scoreManager.score -= this.buybackCost;
         player.scoreManager.harpoonsRemaining += this.buybackHarpoons;
         player.shotTimer = player.shotTimerMax;
+        player.shotTimerActive = true;
         player.buybackPending = false;
         this.uiRenderer.addHarpoonBounce(playerIndex);
         audio.playBonusHarpoon();

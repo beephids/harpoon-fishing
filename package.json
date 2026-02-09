@@ -1,6 +1,6 @@
 {
   "name": "harpoon-fishing",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "One to two players fish for treasure in a vibrant underwater world, using harpoons to snag deep sea creatures. Compete for the highest score in this fast-paced arcade-style game.",
   "type": "module",
   "scripts": {
@@ -28,7 +28,7 @@
     "two player",
     "indie"
   ],
-  "author": "beephid",
+  "author": "beephids",
   "license": "GPL v3.0",
   "devDependencies": {
     "vite": "^6.4.1"

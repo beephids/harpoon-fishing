@@ -182,12 +182,15 @@ export class UIRenderer {
         ctx.fillText('PLAYER 2', cx, 30);
         ctx.restore();
 
+        const p2TimerExpired = p2ShotTimer === 0;
+        const p1TimerExpired = p1ShotTimer === 0;
+
         // P2 Harpoon count (top-left)
         const p2Bounce = this.p2.harpoonBounce > 0 ? Math.sin(this.p2.harpoonBounce * 25) * 8 : 0;
         ctx.save();
         ctx.translate(40, 60 + p2Bounce);
         ctx.scale(1.5, 1.5);
-        this._drawHarpoonIcon(ctx, '#e74c3c');
+        this._drawHarpoonIcon(ctx, '#e74c3c', p2TimerExpired);
         ctx.font = 'bold 28px monospace';
         ctx.fillStyle = '#ffffff';
         ctx.strokeStyle = '#000000';
@@ -233,7 +236,7 @@ export class UIRenderer {
         ctx.save();
         ctx.translate(40, CONFIG.DESIGN_HEIGHT - 80 + p1Bounce);
         ctx.scale(1.5, 1.5);
-        this._drawHarpoonIcon(ctx, '#3498db');
+        this._drawHarpoonIcon(ctx, '#3498db', p1TimerExpired);
         ctx.font = 'bold 28px monospace';
         ctx.fillStyle = '#ffffff';
         ctx.strokeStyle = '#000000';
@@ -264,11 +267,11 @@ export class UIRenderer {
 
     }
 
-    _drawHarpoonIcon(ctx, tintColor = null) {
-        const metal = tintColor || '#d4d4d4';
-        const metalDark = '#9aa0a6';
-        const wood = '#8B5E3C';
-        const woodDark = '#6f452c';
+    _drawHarpoonIcon(ctx, tintColor = null, disabled = false) {
+        const metal = disabled ? '#9aa0a6' : (tintColor || '#d4d4d4');
+        const metalDark = disabled ? '#7d848a' : '#9aa0a6';
+        const wood = disabled ? '#8a8f94' : '#8B5E3C';
+        const woodDark = disabled ? '#6f7479' : '#6f452c';
 
         ctx.save();
         ctx.lineJoin = 'round';
@@ -316,7 +319,7 @@ export class UIRenderer {
         ctx.fillRect(-4, 24, 8, 3);
 
         // Highlight on tip
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.strokeStyle = disabled ? 'rgba(255, 255, 255, 0.35)' : 'rgba(255, 255, 255, 0.6)';
         ctx.lineWidth = 1.2;
         ctx.beginPath();
         ctx.moveTo(0, -12);
@@ -327,7 +330,7 @@ export class UIRenderer {
     }
 
     _renderShotTimer(ctx, shotTimer, centerX, y, barWidth = 600, fillColor = '#3498db') {
-        const barHeight = 24;
+        const barHeight = 32;
         const barX = centerX - barWidth / 2;
         const fraction = Math.max(0, shotTimer / 10);
         const isWarning = shotTimer <= 3;
@@ -374,14 +377,14 @@ export class UIRenderer {
         }
 
         // Timer text
-        ctx.font = 'bold 21px monospace';
+        ctx.font = 'bold 28px system-ui';
         ctx.textAlign = 'center';
         ctx.fillStyle = '#ffffff';
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 2;
         const timerText = Math.ceil(shotTimer).toString();
-        ctx.strokeText(timerText, centerX, y + barHeight / 2 + 5);
-        ctx.fillText(timerText, centerX, y + barHeight / 2 + 5);
+        ctx.strokeText(timerText, centerX, y + barHeight / 2 + 8);
+        ctx.fillText(timerText, centerX, y + barHeight / 2 + 8);
 
         ctx.restore();
     }
@@ -409,7 +412,7 @@ export class UIRenderer {
             ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
         }
 
-        const y = this.isTwoPlayer ? CONFIG.DESIGN_HEIGHT / 2 + 8 : 56;
+        const y = this.isTwoPlayer ? CONFIG.DESIGN_HEIGHT / 2 + 8 : 80;
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 3;
         ctx.strokeText(display, cx, y);

@@ -824,12 +824,11 @@ export class StartScreenState {
         ctx.font = '19px monospace';
         ctx.fillText('\u2014 A chest opens periodically at the center.', x + sSize + 130, y + 16);
         ctx.fillText('Catch the item for big points + bonus harpoons.', x + sSize + 10, y + 40);
-        ctx.fillText('Guarded by a ring of tubeworms!', x + sSize + 10, y + 64);
-        y += 82;
+        y += 70;
 
         // Bonus harpoon hint
         if (this.creatureSheet.loaded) {
-            this.creatureSheet.drawFrame(ctx, 0, 4 * 48, 48, 48, x, y, sSize, sSize);
+            this.creatureSheet.drawFrame(ctx, 0, 4 * 48, 48, 48, x, y - 16, sSize, sSize);
         }
         ctx.fillStyle = RC.legendary;
         ctx.font = 'bold 21px monospace';
@@ -837,7 +836,7 @@ export class StartScreenState {
         ctx.fillStyle = '#cccccc';
         ctx.font = '19px monospace';
         ctx.fillText('\u2014 Some legendary creatures grant bonus harpoons.', x + sSize + 84, y + 16);
-        y += 54;
+        y += 64;
 
         // Difficulty
         ctx.fillStyle = '#f1c40f';

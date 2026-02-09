@@ -98,7 +98,9 @@ export class Harpoon {
         }
     }
 
-    render(ctx, aimAngle, isAiming) {
+    render(ctx, aimAngle, isAiming, isDisabled = false) {
+        const palette = this._getPalette(isDisabled);
+
         // Draw aim guide when aiming and idle
         if ((this.state === 'idle') && isAiming) {
             ctx.save();
@@ -119,7 +121,7 @@ export class Harpoon {
         // Draw rope and harpoon when traveling or retracting
         if (this.state === 'traveling' || this.state === 'retracting') {
             // Rope
-            ctx.strokeStyle = this.ropeColor;
+            ctx.strokeStyle = palette.ropeColor;
             ctx.lineWidth = 3;
             ctx.beginPath();
             ctx.moveTo(this.baseX, this.baseY);
@@ -132,7 +134,7 @@ export class Harpoon {
             // Rotate based on direction - flip for player 2
             ctx.rotate(this.angle * (this.direction === 1 ? -1 : 1));
             if (this.direction === 1) ctx.scale(1, -1);
-            this._drawHarpoonHead(ctx, true);
+            this._drawHarpoonHead(ctx, true, palette.head);
             ctx.restore();
         }
 
@@ -148,25 +150,32 @@ export class Harpoon {
         const launcherScale = 1.5;
         ctx.save();
         ctx.scale(launcherScale, launcherScale);
-        this._drawBallistaLauncher(ctx);
+        this._drawBallistaLauncher(ctx, palette.launcher);
         ctx.restore();
 
         // Harpoon tip (when idle / ready to fire)
         if (this.state === 'idle') {
             ctx.save();
             ctx.translate(0, -30 * launcherScale);
-            this._drawHarpoonHead(ctx, false);
+            this._drawHarpoonHead(ctx, false, palette.head);
             ctx.restore();
         }
 
         ctx.restore();
     }
 
-    _drawHarpoonHead(ctx, withShaft = true) {
-        const metal = '#d4d4d4';
-        const metalDark = '#9aa0a6';
-        const wood = '#8B5E3C';
-        const woodDark = '#6f452c';
+    _drawHarpoonHead(ctx, withShaft = true, palette = null) {
+        const colors = palette || {
+            metal: '#d4d4d4',
+            metalDark: '#9aa0a6',
+            wood: '#8B5E3C',
+            woodDark: '#6f452c',
+            highlight: 'rgba(255, 255, 255, 0.6)',
+        };
+        const metal = colors.metal;
+        const metalDark = colors.metalDark;
+        const wood = colors.wood;
+        const woodDark = colors.woodDark;
         const scale = 1.25;
 
         ctx.save();
@@ -217,7 +226,7 @@ export class Harpoon {
         }
 
         // Highlight on tip
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.strokeStyle = colors.highlight;
         ctx.lineWidth = 1.2;
         ctx.beginPath();
         ctx.moveTo(0, -18);
@@ -227,12 +236,19 @@ export class Harpoon {
         ctx.restore();
     }
 
-    _drawBallistaLauncher(ctx) {
-        const wood = '#8B5E3C';
-        const woodDark = '#6f452c';
-        const metal = '#b0b6bb';
-        const metalDark = '#7d868c';
-        const stringColor = 'rgba(255, 255, 255, 0.6)';
+    _drawBallistaLauncher(ctx, palette = null) {
+        const colors = palette || {
+            wood: '#8B5E3C',
+            woodDark: '#6f452c',
+            metal: '#b0b6bb',
+            metalDark: '#7d868c',
+            stringColor: 'rgba(255, 255, 255, 0.6)',
+        };
+        const wood = colors.wood;
+        const woodDark = colors.woodDark;
+        const metal = colors.metal;
+        const metalDark = colors.metalDark;
+        const stringColor = colors.stringColor;
 
         ctx.save();
         ctx.lineJoin = 'round';
@@ -304,5 +320,45 @@ export class Harpoon {
         ctx.fillRect(-4, -6, 8, 6);
 
         ctx.restore();
+    }
+
+    _getPalette(disabled) {
+        if (!disabled) {
+            return {
+                head: {
+                    metal: '#d4d4d4',
+                    metalDark: '#9aa0a6',
+                    wood: '#8B5E3C',
+                    woodDark: '#6f452c',
+                    highlight: 'rgba(255, 255, 255, 0.6)',
+                },
+                launcher: {
+                    wood: '#8B5E3C',
+                    woodDark: '#6f452c',
+                    metal: '#b0b6bb',
+                    metalDark: '#7d868c',
+                    stringColor: 'rgba(255, 255, 255, 0.6)',
+                },
+                ropeColor: this.ropeColor,
+            };
+        }
+
+        return {
+            head: {
+                metal: '#9aa0a6',
+                metalDark: '#7d848a',
+                wood: '#8a8f94',
+                woodDark: '#6f7479',
+                highlight: 'rgba(255, 255, 255, 0.35)',
+            },
+            launcher: {
+                wood: '#8a8f94',
+                woodDark: '#6f7479',
+                metal: '#8c9297',
+                metalDark: '#6f767c',
+                stringColor: 'rgba(255, 255, 255, 0.35)',
+            },
+            ropeColor: '#7d848a',
+        };
     }
 }
