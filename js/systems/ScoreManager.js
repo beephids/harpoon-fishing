@@ -41,7 +41,7 @@ export class ScoreManager {
 
     get accuracy() {
         if (this.harpoonsFired === 0) return 0;
-        return this.catches.length / this.harpoonsFired;
+        return Math.min(1, this.catches.length / this.harpoonsFired);
     }
 
     get isGameOver() {

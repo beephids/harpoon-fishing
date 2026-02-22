@@ -1,4 +1,5 @@
 import { CONFIG } from '../data/config.js';
+import { roundedRect } from '../utils/math.js';
 
 class CatchToast {
     constructor(name, rarity, points, bonusHarpoons, x, y, playerIndex = 0) {
@@ -329,10 +330,10 @@ export class UIRenderer {
         ctx.restore();
     }
 
-    _renderShotTimer(ctx, shotTimer, centerX, y, barWidth = 600, fillColor = '#3498db') {
+    _renderShotTimer(ctx, shotTimer, centerX, y, barWidth = 600, fillColor = '#3498db', shotTimerMax = 10) {
         const barHeight = 32;
         const barX = centerX - barWidth / 2;
-        const fraction = Math.max(0, shotTimer / 10);
+        const fraction = Math.max(0, shotTimer / shotTimerMax);
         const isWarning = shotTimer <= 3;
 
         ctx.save();
@@ -346,33 +347,17 @@ export class UIRenderer {
         ctx.globalAlpha = timerAlpha;
 
         // Background bar
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-        ctx.beginPath();
         const r = barHeight / 2;
-        ctx.moveTo(barX + r, y);
-        ctx.lineTo(barX + barWidth - r, y);
-        ctx.quadraticCurveTo(barX + barWidth, y, barX + barWidth, y + r);
-        ctx.quadraticCurveTo(barX + barWidth, y + barHeight, barX + barWidth - r, y + barHeight);
-        ctx.lineTo(barX + r, y + barHeight);
-        ctx.quadraticCurveTo(barX, y + barHeight, barX, y + r);
-        ctx.quadraticCurveTo(barX, y, barX + r, y);
-        ctx.closePath();
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        roundedRect(ctx, barX, y, barWidth, barHeight, r);
         ctx.fill();
 
         // Fill bar
         const fillWidth = barWidth * fraction;
         if (fillWidth > 0) {
             ctx.fillStyle = isWarning ? '#e74c3c' : fillColor;
-            ctx.beginPath();
             const fw = Math.max(fillWidth, barHeight);
-            ctx.moveTo(barX + r, y);
-            ctx.lineTo(barX + fw - r, y);
-            ctx.quadraticCurveTo(barX + fw, y, barX + fw, y + r);
-            ctx.quadraticCurveTo(barX + fw, y + barHeight, barX + fw - r, y + barHeight);
-            ctx.lineTo(barX + r, y + barHeight);
-            ctx.quadraticCurveTo(barX, y + barHeight, barX, y + r);
-            ctx.quadraticCurveTo(barX, y, barX + r, y);
-            ctx.closePath();
+            roundedRect(ctx, barX, y, fw, barHeight, r);
             ctx.fill();
         }
 
@@ -435,18 +420,7 @@ export class UIRenderer {
             const w = metrics.width + padding * 2;
 
             ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-            ctx.beginPath();
-            const rx = -w / 2, ry = -30, rw = w, rh = 60, r = 12;
-            ctx.moveTo(rx + r, ry);
-            ctx.lineTo(rx + rw - r, ry);
-            ctx.quadraticCurveTo(rx + rw, ry, rx + rw, ry + r);
-            ctx.lineTo(rx + rw, ry + rh - r);
-            ctx.quadraticCurveTo(rx + rw, ry + rh, rx + rw - r, ry + rh);
-            ctx.lineTo(rx + r, ry + rh);
-            ctx.quadraticCurveTo(rx, ry + rh, rx, ry + rh - r);
-            ctx.lineTo(rx, ry + r);
-            ctx.quadraticCurveTo(rx, ry, rx + r, ry);
-            ctx.closePath();
+            roundedRect(ctx, -w / 2, -30, w, 60, 12);
             ctx.fill();
 
             // Text

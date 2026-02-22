@@ -33,7 +33,9 @@ export class ScoreScreenState {
         this.game.canvas.addEventListener('pointerdown', this._onTap);
         this._onKeyDown = (e) => {
             if (e.repeat) return;
-            this._onTap();
+            if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
+                this._onTap();
+            }
         };
         window.addEventListener('keydown', this._onKeyDown);
     }

@@ -23,6 +23,8 @@ export const CONFIG = {
     // Spawning
     CREATURE_DESPAWN_MARGIN: 100,
     MAX_CREATURES_ON_SCREEN: 25,
+    GHOST_SPAWN_INTERVAL_NORMAL: 30,
+    GHOST_SPAWN_INTERVAL_BOOSTED: 15,
 
     // Rarity colors
     // Dynamic text scale (updated on resize for mobile readability)

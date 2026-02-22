@@ -68,3 +68,34 @@ export function segmentIntersectsCircle(ax, ay, bx, by, cx, cy, r) {
 
     return -1;
 }
+
+/**
+ * Convert a pointer event's clientX/clientY to canvas-space coordinates,
+ * accounting for CSS scaling of the canvas element.
+ */
+export function screenToCanvas(canvas, e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return {
+        x: (e.clientX - rect.left) * scaleX,
+        y: (e.clientY - rect.top) * scaleY,
+    };
+}
+
+/**
+ * Trace a rounded rectangle path on ctx (does not fill or stroke).
+ */
+export function roundedRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+}

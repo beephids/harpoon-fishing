@@ -1,5 +1,5 @@
 import { CONFIG } from '../data/config.js';
-import { clamp, degToRad } from '../utils/math.js';
+import { clamp, degToRad, screenToCanvas } from '../utils/math.js';
 
 // Input manager for two players with split-screen zones
 // Bottom half controls Player 1, Top half controls Player 2
@@ -99,13 +99,7 @@ export class TwoPlayerInputManager {
     }
 
     _screenToCanvas(e) {
-        const rect = this.canvas.getBoundingClientRect();
-        const scaleX = this.canvas.width / rect.width;
-        const scaleY = this.canvas.height / rect.height;
-        return {
-            x: (e.clientX - rect.left) * scaleX,
-            y: (e.clientY - rect.top) * scaleY,
-        };
+        return screenToCanvas(this.canvas, e);
     }
 
     _getPlayerForPosition(pos) {

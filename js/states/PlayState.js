@@ -11,6 +11,7 @@ import { ParticleSystem } from '../systems/ParticleSystem.js';
 import { Harpoon } from '../entities/Harpoon.js';
 import { TreasureChest } from '../entities/TreasureChest.js';
 import { audio } from '../utils/audio.js';
+import { screenToCanvas, roundedRect } from '../utils/math.js';
 
 export class PlayState {
     constructor(game, playerCount = 1, roundTime = 180) {
@@ -34,7 +35,7 @@ export class PlayState {
         } else {
             this.input = new InputManager(game.canvas);
         }
-        this.spawnManager = new SpawnManager(this.creatureSheet, this.sillySheet);
+        this.spawnManager = new SpawnManager(this.creatureSheet, this.sillySheet, this.isTwoPlayer);
         this.collision = new CollisionSystem();
         this.particles = new ParticleSystem();
 
@@ -165,7 +166,8 @@ export class PlayState {
         // Spawn creatures (use average harpoons remaining for difficulty)
         if (!this.gameOverPending) {
             const avgHarpoons = this.players.reduce((sum, p) => sum + p.scoreManager.harpoonsRemaining, 0) / this.players.length;
-            this.spawnManager.update(dt, avgHarpoons, this.creatures);
+            const useBoostedGhostRate = this._shouldUseBoostedGhostRate();
+            this.spawnManager.update(dt, avgHarpoons, this.creatures, useBoostedGhostRate);
         }
 
         // Treasure chest
@@ -196,6 +198,17 @@ export class PlayState {
 
         // Check for game over conditions
         this._checkGameOver();
+    }
+
+    _shouldUseBoostedGhostRate() {
+        if (!this.isTwoPlayer) return false;
+        return this.players.every(player => this._isPlayerActive(player));
+    }
+
+    _isPlayerActive(player) {
+        if (player.gameOver || player.buybackPending) return false;
+        if (player.scoreManager.harpoonsRemaining <= 0) return false;
+        return true;
     }
 
     _updatePlayer(playerIndex, dt) {
@@ -435,17 +448,7 @@ export class PlayState {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
         const bw = 690, bh = 150, br = 18;
         const bx = cx - bw / 2, by = cy - bh / 2;
-        ctx.beginPath();
-        ctx.moveTo(bx + br, by);
-        ctx.lineTo(bx + bw - br, by);
-        ctx.quadraticCurveTo(bx + bw, by, bx + bw, by + br);
-        ctx.lineTo(bx + bw, by + bh - br);
-        ctx.quadraticCurveTo(bx + bw, by + bh, bx + bw - br, by + bh);
-        ctx.lineTo(bx + br, by + bh);
-        ctx.quadraticCurveTo(bx, by + bh, bx, by + bh - br);
-        ctx.lineTo(bx, by + br);
-        ctx.quadraticCurveTo(bx, by, bx + br, by);
-        ctx.closePath();
+        roundedRect(ctx, bx, by, bw, bh, br);
         ctx.fill();
 
         // Text: "500 pts = 1 harpoon + keep going!"
@@ -477,13 +480,7 @@ export class PlayState {
     }
 
     _screenToCanvas(e) {
-        const rect = this.game.canvas.getBoundingClientRect();
-        const scaleX = this.game.canvas.width / rect.width;
-        const scaleY = this.game.canvas.height / rect.height;
-        return {
-            x: (e.clientX - rect.left) * scaleX,
-            y: (e.clientY - rect.top) * scaleY,
-        };
+        return screenToCanvas(this.game.canvas, e);
     }
 
     _hitTest(pos, bounds) {
@@ -529,14 +526,6 @@ export class PlayState {
 
     _onDevKeyDown(e) {
         if (e.repeat) return;
-
-        // Dev: G adds 500 score
-        if (e.key === 'g' || e.key === 'G') {
-            for (const player of this.players) {
-                player.scoreManager.score += 500;
-            }
-            return;
-        }
 
         // Buyback keyboard controls
         // P1: ArrowUp = accept, ArrowDown = reject

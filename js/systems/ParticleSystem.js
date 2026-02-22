@@ -100,6 +100,7 @@ export class ParticleSystem {
     }
 
     render(ctx) {
+        ctx.save();
         for (const p of this.particles) {
             ctx.globalAlpha = p.alpha;
             ctx.fillStyle = p.color;
@@ -107,6 +108,6 @@ export class ParticleSystem {
             ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
             ctx.fill();
         }
-        ctx.globalAlpha = 1;
+        ctx.restore();
     }
 }

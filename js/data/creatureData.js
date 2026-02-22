@@ -11,6 +11,14 @@ function frames(row) {
     ];
 }
 
+const RARITY_BASE_SPEEDS = {
+    common: 100,
+    uncommon: 150,
+    rare: 200,
+    epic: 250,
+    legendary: 300,
+};
+
 export const CREATURE_TYPES = {
     anglerfish: {
         frames: frames(9),
@@ -18,8 +26,8 @@ export const CREATURE_TYPES = {
         points: 75,
         bonusHarpoons: 0,
         displaySize: 112,
-        hitboxRadius: 32,
-        baseSpeed: 135,
+        hitboxRadius: 28,
+        baseSpeed: RARITY_BASE_SPEEDS.epic,
         name: 'Anglerfish',
     },
     barrelfish: {
@@ -29,7 +37,7 @@ export const CREATURE_TYPES = {
         bonusHarpoons: 0,
         displaySize: 96,
         hitboxRadius: 24,
-        baseSpeed: 75,
+        baseSpeed: RARITY_BASE_SPEEDS.legendary,
         name: 'Barrelfish',
     },
     blobfish: {
@@ -38,8 +46,8 @@ export const CREATURE_TYPES = {
         points: 50,
         bonusHarpoons: 0,
         displaySize: 96,
-        hitboxRadius: 26,
-        baseSpeed: 135,
+        hitboxRadius: 24,
+        baseSpeed: RARITY_BASE_SPEEDS.rare,
         name: 'Blobfish',
     },
     cookie_cutter_shark: {
@@ -48,8 +56,8 @@ export const CREATURE_TYPES = {
         points: 30,
         bonusHarpoons: 0,
         displaySize: 96,
-        hitboxRadius: 29,
-        baseSpeed: 113,
+        hitboxRadius: 24,
+        baseSpeed: RARITY_BASE_SPEEDS.uncommon,
         name: 'Cookie Cutter Shark',
     },
     dumbo_octopus: {
@@ -58,8 +66,8 @@ export const CREATURE_TYPES = {
         points: 50,
         bonusHarpoons: 0,
         displaySize: 96,
-        hitboxRadius: 30,
-        baseSpeed: 120,
+        hitboxRadius: 24,
+        baseSpeed: RARITY_BASE_SPEEDS.rare,
         name: 'Dumbo Octopus',
     },
     fangtooth: {
@@ -68,8 +76,8 @@ export const CREATURE_TYPES = {
         points: 30,
         bonusHarpoons: 0,
         displaySize: 96,
-        hitboxRadius: 26,
-        baseSpeed: 75,
+        hitboxRadius: 24,
+        baseSpeed: RARITY_BASE_SPEEDS.uncommon,
         name: 'Fangtooth',
     },
     frilled_shark: {
@@ -78,8 +86,8 @@ export const CREATURE_TYPES = {
         points: 50,
         bonusHarpoons: 0,
         displaySize: 96,
-        hitboxRadius: 23,
-        baseSpeed: 210,
+        hitboxRadius: 24,
+        baseSpeed: RARITY_BASE_SPEEDS.rare,
         name: 'Frilled Shark',
         waveAmplitude: 30,
         waveFrequency: 3,
@@ -90,8 +98,8 @@ export const CREATURE_TYPES = {
         points: 10,
         bonusHarpoons: 0,
         displaySize: 96,
-        hitboxRadius: 26,
-        baseSpeed: 100,
+        hitboxRadius: 24,
+        baseSpeed: RARITY_BASE_SPEEDS.common,
         name: 'Giant Isopod',
     },
     goblin_shark: {
@@ -100,8 +108,8 @@ export const CREATURE_TYPES = {
         points: 75,
         bonusHarpoons: 0,
         displaySize: 128,
-        hitboxRadius: 38,
-        baseSpeed: 200,
+        hitboxRadius: 32,
+        baseSpeed: RARITY_BASE_SPEEDS.epic,
         name: 'Goblin Shark',
     },
     gulper_eel: {
@@ -110,8 +118,8 @@ export const CREATURE_TYPES = {
         points: 100,
         bonusHarpoons: 1,
         displaySize: 112,
-        hitboxRadius: 34,
-        baseSpeed: 205,
+        hitboxRadius: 28,
+        baseSpeed: RARITY_BASE_SPEEDS.legendary,
         name: 'Gulper Eel',
     },
     hatchetfish: {
@@ -120,8 +128,8 @@ export const CREATURE_TYPES = {
         points: 10,
         bonusHarpoons: 0,
         displaySize: 80,
-        hitboxRadius: 19,
-        baseSpeed: 105,
+        hitboxRadius: 20,
+        baseSpeed: RARITY_BASE_SPEEDS.common,
         name: 'Hatchetfish',
     },
     lanternfish: {
@@ -130,8 +138,8 @@ export const CREATURE_TYPES = {
         points: 10,
         bonusHarpoons: 0,
         displaySize: 112,
-        hitboxRadius: 32,
-        baseSpeed: 83,
+        hitboxRadius: 28,
+        baseSpeed: RARITY_BASE_SPEEDS.common,
         name: 'Lanternfish',
     },
     tubeworm: {
@@ -140,8 +148,8 @@ export const CREATURE_TYPES = {
         points: 30,
         bonusHarpoons: 0,
         displaySize: 220,
-        hitboxRadius: 80,
-        baseSpeed: 100,
+        hitboxRadius: 55,
+        baseSpeed: RARITY_BASE_SPEEDS.common,
         name: 'Tubeworm',
     },
     sea_spider: {
@@ -150,8 +158,8 @@ export const CREATURE_TYPES = {
         points: 20,
         bonusHarpoons: 0,
         displaySize: 128,
-        hitboxRadius: 36,
-        baseSpeed: 200,
+        hitboxRadius: 32,
+        baseSpeed: RARITY_BASE_SPEEDS.common,
         name: 'Sea Spider',
     },
     sea_toad: {
@@ -160,8 +168,8 @@ export const CREATURE_TYPES = {
         points: 30,
         bonusHarpoons: 0,
         displaySize: 80,
-        hitboxRadius: 21,
-        baseSpeed: 200,
+        hitboxRadius: 20,
+        baseSpeed: RARITY_BASE_SPEEDS.uncommon,
         name: 'Sea Toad',
     },
     siphonophore: {
@@ -170,8 +178,8 @@ export const CREATURE_TYPES = {
         points: 10,
         bonusHarpoons: 0,
         displaySize: 96,
-        hitboxRadius: 26,
-        baseSpeed: 180,
+        hitboxRadius: 24,
+        baseSpeed: RARITY_BASE_SPEEDS.common,
         name: 'Siphonophore',
     },
     spider_crab: {
@@ -180,8 +188,8 @@ export const CREATURE_TYPES = {
         points: 50,
         bonusHarpoons: 0,
         displaySize: 96,
-        hitboxRadius: 29,
-        baseSpeed: 100,
+        hitboxRadius: 24,
+        baseSpeed: RARITY_BASE_SPEEDS.rare,
         name: 'Spider Crab',
     },
     squat_lobster: {
@@ -190,8 +198,8 @@ export const CREATURE_TYPES = {
         points: 10,
         bonusHarpoons: 0,
         displaySize: 96,
-        hitboxRadius: 30,
-        baseSpeed: 83,
+        hitboxRadius: 24,
+        baseSpeed: RARITY_BASE_SPEEDS.common,
         name: 'Squat Lobster',
     },
     vampire_squid: {
@@ -200,8 +208,8 @@ export const CREATURE_TYPES = {
         points: 30,
         bonusHarpoons: 0,
         displaySize: 96,
-        hitboxRadius: 29,
-        baseSpeed: 200,
+        hitboxRadius: 24,
+        baseSpeed: RARITY_BASE_SPEEDS.uncommon,
         name: 'Vampire Squid',
     },
     vantafish: {
@@ -210,8 +218,8 @@ export const CREATURE_TYPES = {
         points: 50,
         bonusHarpoons: 0,
         displaySize: 80,
-        hitboxRadius: 23,
-        baseSpeed: 150,
+        hitboxRadius: 20,
+        baseSpeed: RARITY_BASE_SPEEDS.rare,
         name: 'Vantafish',
     },
     viperfish: {
@@ -220,8 +228,8 @@ export const CREATURE_TYPES = {
         points: 10,
         bonusHarpoons: 0,
         displaySize: 96,
-        hitboxRadius: 29,
-        baseSpeed: 165,
+        hitboxRadius: 24,
+        baseSpeed: RARITY_BASE_SPEEDS.common,
         name: 'Viperfish',
     },
     winged_comb_jelly: {
@@ -230,8 +238,8 @@ export const CREATURE_TYPES = {
         points: 20,
         bonusHarpoons: 0,
         displaySize: 96,
-        hitboxRadius: 26,
-        baseSpeed: 195,
+        hitboxRadius: 24,
+        baseSpeed: RARITY_BASE_SPEEDS.common,
         name: 'Winged Comb Jelly',
     },
 };
@@ -282,10 +290,10 @@ export const GHOST_CREATURE = {
     ],
     rarity: 'legendary',
     points: 0,
-    bonusHarpoons: 10,
+    bonusHarpoons: 7,
     displaySize: 56,
-    hitboxRadius: 21,
-    baseSpeed: 120,
+    hitboxRadius: 14,
+    baseSpeed: RARITY_BASE_SPEEDS.legendary,
     name: 'Ghost',
     useSillySpriteSheet: true,
 };

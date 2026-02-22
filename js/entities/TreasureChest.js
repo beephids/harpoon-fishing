@@ -160,8 +160,6 @@ export class TreasureChest {
 
         // The treasure item that appears from the chest
         this.spawnedTreasure = null;
-        this.treasureRiseOffset = 0;
-        this.treasureMaxRise = 0; // keep treasure at spawn position for fair 2P play
         this.retreatProgress = 0;
 
         this.glowPhase = 0;
@@ -179,7 +177,6 @@ export class TreasureChest {
                     this.timer = 0;
                     this.transitionProgress = 0;
                     this.spawnedTreasure = null;
-                    this.treasureRiseOffset = 0;
                     this.retreatProgress = 0;
                     this.openDuration = randomRange(3, 5);
                 }
@@ -210,17 +207,9 @@ export class TreasureChest {
 
             case 'open':
                 this.timer += dt;
-                // Keep the treasure at its spawn position (no rise)
-                if (this.treasureRiseOffset < this.treasureMaxRise) {
-                    this.treasureRiseOffset += 60 * dt;
-                    if (this.treasureRiseOffset > this.treasureMaxRise) {
-                        this.treasureRiseOffset = this.treasureMaxRise;
-                    }
-                }
-                // Position the treasure above the chest
                 if (this.spawnedTreasure && this.spawnedTreasure.alive) {
                     this.spawnedTreasure.x = this.x;
-                    this.spawnedTreasure.y = this.y - this.treasureRiseOffset;
+                    this.spawnedTreasure.y = this.y;
                     this.spawnedTreasure.renderY = this.spawnedTreasure.y;
                     this.spawnedTreasure.update(dt);
                 }
@@ -247,11 +236,6 @@ export class TreasureChest {
                     this.timer = 0;
                     this.transitionProgress = 1;
                 } else if (this.spawnedTreasure && this.spawnedTreasure.alive) {
-                    // Lerp treasure back down
-                    const offset = this.treasureMaxRise * (1 - this.retreatProgress);
-                    this.spawnedTreasure.x = this.x;
-                    this.spawnedTreasure.y = this.y - offset;
-                    this.spawnedTreasure.renderY = this.spawnedTreasure.y;
                     this.spawnedTreasure.update(dt);
                 }
                 break;

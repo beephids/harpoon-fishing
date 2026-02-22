@@ -5,16 +5,18 @@ import { SeaCreature } from '../entities/SeaCreature.js';
 import { randomRange, randomInt } from '../utils/math.js';
 
 export class SpawnManager {
-    constructor(creatureSpriteSheet, sillySpriteSheet) {
+    constructor(creatureSpriteSheet, sillySpriteSheet, isTwoPlayer = false) {
         this.spriteSheet = creatureSpriteSheet;
         this.sillySpriteSheet = sillySpriteSheet;
+        this.isTwoPlayer = isTwoPlayer;
         this.spawnTimer = 0;
         this.nextSpawnTime = 2; // first spawn after 2 seconds
         this.ghostTimer = 0;
-        this.ghostInterval = 30; // ghost spawns every 30 seconds
+        this.normalGhostInterval = CONFIG.GHOST_SPAWN_INTERVAL_NORMAL;
+        this.boostedGhostInterval = CONFIG.GHOST_SPAWN_INTERVAL_BOOSTED;
     }
 
-    update(dt, harpoonsRemaining, creatures) {
+    update(dt, harpoonsRemaining, creatures, useBoostedGhostRate = this.isTwoPlayer) {
         this.spawnTimer += dt;
         this.ghostTimer += dt;
 
@@ -33,8 +35,10 @@ export class SpawnManager {
             }
         }
 
-        // Ghost spawning every 10 seconds
-        if (this.ghostTimer >= this.ghostInterval) {
+        const ghostInterval = useBoostedGhostRate ? this.boostedGhostInterval : this.normalGhostInterval;
+
+        // Ghost spawning cadence can scale down when a 2P player is out
+        if (this.ghostTimer >= ghostInterval) {
             this.ghostTimer = 0;
             this._spawnGhost(creatures);
         }

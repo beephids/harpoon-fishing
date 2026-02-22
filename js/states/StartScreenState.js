@@ -4,6 +4,7 @@ import { WaterRenderer } from '../rendering/WaterRenderer.js';
 import { Animator } from '../rendering/Animator.js';
 import { CREATURE_TYPES } from '../data/creatureData.js';
 import { audio } from '../utils/audio.js';
+import { screenToCanvas, roundedRect } from '../utils/math.js';
 
 export class StartScreenState {
     constructor(game) {
@@ -99,13 +100,7 @@ export class StartScreenState {
     }
 
     _screenToCanvas(e) {
-        const rect = this.game.canvas.getBoundingClientRect();
-        const scaleX = this.game.canvas.width / rect.width;
-        const scaleY = this.game.canvas.height / rect.height;
-        return {
-            x: (e.clientX - rect.left) * scaleX,
-            y: (e.clientY - rect.top) * scaleY,
-        };
+        return screenToCanvas(this.game.canvas, e);
     }
 
     _onTap(e) {
@@ -346,19 +341,7 @@ export class StartScreenState {
 
         // Button background
         ctx.fillStyle = color;
-        ctx.beginPath();
-        const r = 10;
-        const rx = -w / 2, ry = -h / 2;
-        ctx.moveTo(rx + r, ry);
-        ctx.lineTo(rx + w - r, ry);
-        ctx.quadraticCurveTo(rx + w, ry, rx + w, ry + r);
-        ctx.lineTo(rx + w, ry + h - r);
-        ctx.quadraticCurveTo(rx + w, ry + h, rx + w - r, ry + h);
-        ctx.lineTo(rx + r, ry + h);
-        ctx.quadraticCurveTo(rx, ry + h, rx, ry + h - r);
-        ctx.lineTo(rx, ry + r);
-        ctx.quadraticCurveTo(rx, ry, rx + r, ry);
-        ctx.closePath();
+        roundedRect(ctx, -w / 2, -h / 2, w, h, 10);
         ctx.fill();
 
         // Button border
@@ -381,19 +364,7 @@ export class StartScreenState {
 
         // Button background
         ctx.fillStyle = color;
-        ctx.beginPath();
-        const r = 10;
-        const rx = -w / 2, ry = -h / 2;
-        ctx.moveTo(rx + r, ry);
-        ctx.lineTo(rx + w - r, ry);
-        ctx.quadraticCurveTo(rx + w, ry, rx + w, ry + r);
-        ctx.lineTo(rx + w, ry + h - r);
-        ctx.quadraticCurveTo(rx + w, ry + h, rx + w - r, ry + h);
-        ctx.lineTo(rx + r, ry + h);
-        ctx.quadraticCurveTo(rx, ry + h, rx, ry + h - r);
-        ctx.lineTo(rx, ry + r);
-        ctx.quadraticCurveTo(rx, ry, rx + r, ry);
-        ctx.closePath();
+        roundedRect(ctx, -w / 2, -h / 2, w, h, 10);
         ctx.fill();
 
         // Button border
@@ -487,17 +458,7 @@ export class StartScreenState {
 
         // Button background
         ctx.fillStyle = isActive ? 'rgba(241, 196, 15, 0.25)' : 'rgba(0, 0, 0, 0.45)';
-        ctx.beginPath();
-        ctx.moveTo(left + r, top);
-        ctx.lineTo(left + size - r, top);
-        ctx.quadraticCurveTo(left + size, top, left + size, top + r);
-        ctx.lineTo(left + size, top + size - r);
-        ctx.quadraticCurveTo(left + size, top + size, left + size - r, top + size);
-        ctx.lineTo(left + r, top + size);
-        ctx.quadraticCurveTo(left, top + size, left, top + size - r);
-        ctx.lineTo(left, top + r);
-        ctx.quadraticCurveTo(left, top, left + r, top);
-        ctx.closePath();
+        roundedRect(ctx, left, top, size, size, r);
         ctx.fill();
 
         // Button border
@@ -615,18 +576,7 @@ export class StartScreenState {
 
         // Modal background
         ctx.fillStyle = 'rgba(10, 16, 22, 0.96)';
-        ctx.beginPath();
-        const r = 16;
-        ctx.moveTo(modal.x + r, modal.y);
-        ctx.lineTo(modal.x + modal.w - r, modal.y);
-        ctx.quadraticCurveTo(modal.x + modal.w, modal.y, modal.x + modal.w, modal.y + r);
-        ctx.lineTo(modal.x + modal.w, modal.y + modal.h - r);
-        ctx.quadraticCurveTo(modal.x + modal.w, modal.y + modal.h, modal.x + modal.w - r, modal.y + modal.h);
-        ctx.lineTo(modal.x + r, modal.y + modal.h);
-        ctx.quadraticCurveTo(modal.x, modal.y + modal.h, modal.x, modal.y + modal.h - r);
-        ctx.lineTo(modal.x, modal.y + r);
-        ctx.quadraticCurveTo(modal.x, modal.y, modal.x + r, modal.y);
-        ctx.closePath();
+        roundedRect(ctx, modal.x, modal.y, modal.w, modal.h, 16);
         ctx.fill();
 
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
@@ -724,18 +674,7 @@ export class StartScreenState {
 
         // Modal background
         ctx.fillStyle = 'rgba(10, 16, 22, 0.96)';
-        ctx.beginPath();
-        const r = 16;
-        ctx.moveTo(modal.x + r, modal.y);
-        ctx.lineTo(modal.x + modal.w - r, modal.y);
-        ctx.quadraticCurveTo(modal.x + modal.w, modal.y, modal.x + modal.w, modal.y + r);
-        ctx.lineTo(modal.x + modal.w, modal.y + modal.h - r);
-        ctx.quadraticCurveTo(modal.x + modal.w, modal.y + modal.h, modal.x + modal.w - r, modal.y + modal.h);
-        ctx.lineTo(modal.x + r, modal.y + modal.h);
-        ctx.quadraticCurveTo(modal.x, modal.y + modal.h, modal.x, modal.y + modal.h - r);
-        ctx.lineTo(modal.x, modal.y + r);
-        ctx.quadraticCurveTo(modal.x, modal.y, modal.x + r, modal.y);
-        ctx.closePath();
+        roundedRect(ctx, modal.x, modal.y, modal.w, modal.h, 16);
         ctx.fill();
 
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
