@@ -293,7 +293,7 @@ export const GHOST_CREATURE = {
     bonusHarpoons: 7,
     displaySize: 56,
     hitboxRadius: 14,
-    baseSpeed: RARITY_BASE_SPEEDS.legendary,
+    baseSpeed: RARITY_BASE_SPEEDS.rare,
     name: 'Ghost',
     useSillySpriteSheet: true,
 };
