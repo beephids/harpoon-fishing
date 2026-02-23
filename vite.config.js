@@ -1,18 +1,22 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig(({ command }) => {
-    const repoName = process.env.GITHUB_REPOSITORY?.split('/')[1] || 'harpoon-fishing';
+    const configuredBase = process.env.VITE_BASE_PATH?.trim();
+    const base = command === 'build'
+        ? (configuredBase && configuredBase.length > 0 ? configuredBase : './')
+        : '/';
+
     return {
         root: '.',
         publicDir: 'assets',
-        base: command === 'build' ? `/${repoName}/` : '/',
-    build: {
-        outDir: 'dist',
-        assetsDir: 'assets',
-    },
-    server: {
-        port: 3000,
-        open: true,
-    },
+        base,
+        build: {
+            outDir: 'dist',
+            assetsDir: 'assets',
+        },
+        server: {
+            port: 3000,
+            open: true,
+        },
     };
 });
