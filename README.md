@@ -4,7 +4,7 @@ A top-down arcade fishing game where you aim and fire harpoons to catch deep-sea
 
 Built with vanilla JavaScript and the Canvas 2D API — no frameworks, no dependencies.
 
-![Two-player gameplay](screenshots/gameplay-2p.png)
+![Single-player gameplay](assets/screenshots/ss2.png)
 
 ## How to Play
 
@@ -26,39 +26,58 @@ Drag to aim your harpoon, release to fire. Catch creatures to earn points and bo
 - **Two Player** — split-screen competitive mode with a shared play field
 - **Configurable Rounds** — set round length from 1 to 10 minutes
 
-![Start screen](screenshots/start-screen.png)
+![Start screen](assets/screenshots/ss1.png)
 
 ### 22 Deep-Sea Creatures
 
-Creatures are organized into rarity tiers with increasing point values and speed:
+Creatures are grouped by rarity, with higher tiers moving faster and scoring more points.
 
-| Rarity    | Examples                              | Points    |
-|-----------|---------------------------------------|-----------|
-| Common    | Blobfish, Dumbo Octopus, Sea Toad     | 10–15     |
-| Uncommon  | Vampire Squid, Frilled Shark          | 25–35     |
-| Rare      | Anglerfish, Gulper Eel, Fangtooth     | 50–65     |
-| Epic      | Goblin Shark, Sea Spider, Lanternfish | 100–150   |
-| Legendary | Siphonophore                          | 10        |
+| Rarity    | Count | Base Speed | Point Range | Examples                             |
+|-----------|-------|------------|-------------|--------------------------------------|
+| Common    | 8     | 100        | 10-30       | Giant Isopod, Sea Spider, Tubeworm   |
+| Uncommon  | 4     | 150        | 30          | Cookie Cutter Shark, Vampire Squid   |
+| Rare      | 5     | 200        | 50          | Blobfish, Frilled Shark, Spider Crab |
+| Epic      | 2     | 250        | 75          | Anglerfish, Goblin Shark             |
+| Legendary | 2     | 300        | 100         | Barrelfish, Gulper Eel               |
 
-Rarer creatures move faster and are harder to hit, but some award bonus harpoons on catch. A ghost creature appears every 30 seconds and grants +10 harpoons if caught.
+Special spawn:
+
+- **Ghost** (not part of the 22 standard species): 0 points, +7 harpoons, spawns every 30 seconds (or 15 seconds in active two-player flow).
 
 ### Dynamic Difficulty
 
-The game gets harder as your harpoon supply dwindles:
+Difficulty is based on remaining harpoons and affects rarity odds, movement speed, and spawn cadence:
 
-- **Early** (7+ harpoons) — mostly common spawns, normal speed
-- **Mid** (4–6 harpoons) — uncommon and rare creatures appear, 1.3x speed
-- **Late** (0–3 harpoons) — epic and legendary creatures enter, 1.6x speed
+| Tier  | Harpoons | Rarity Weights (Common/Uncommon/Rare/Epic/Legendary) | Speed Multiplier | Spawn Interval |
+|-------|----------|------------------------------------------------------|------------------|----------------|
+| Early | 7+       | 69 / 20 / 5 / 5 / 1                                  | 1.0x             | 1.5-3.0s       |
+| Mid   | 4-6      | 39 / 30 / 20 / 10 / 1                                | 1.3x             | 1.0-2.5s       |
+| Late  | 0-3      | 20 / 15 / 30 / 20 / 10                               | 1.6x             | 0.8-2.0s       |
 
-Schools of 3–6 creatures occasionally spawn together for big scoring opportunities.
+Additional spawn behavior:
+
+- 30% chance to spawn a school instead of a single creature.
+- Schools are common creatures only and contain 3-6 fish.
 
 ### Treasure Chest
 
-A treasure chest at the center of the screen opens at random intervals, revealing one of 17 items worth 150–750 points with bonus harpoons. Time your shot to snag it before it closes.
+A chest at fixed center position (`x: 960`, `y: 525`) cycles through open/close states:
+
+- Opens after a random 15-30 second closed interval.
+- Stays open for a random 3-5 seconds.
+- Uses short transitions (0.5s open/close, ~1s retreat).
+
+When opened, it spawns one random treasure from 17 items:
+
+- Value range: 150-450 points.
+- Bonus harpoons: +2 to +3.
+- Treasure is treated as legendary rarity.
+
+By default, each treasure is surrounded by a rotating ring of 6 tubeworms for extra risk/reward catches.
 
 ### Two-Player Competitive
 
-![Single-player gameplay](screenshots/gameplay-1p.png)
+![Two-player gameplay](assets/screenshots/ss4.png)
 
 Players fire from opposite ends of the screen into a shared ocean. When your shot timer expires, you can buy back 5 harpoons for 500 points — a risk/reward tradeoff that keeps matches close.
 
@@ -66,7 +85,7 @@ Players fire from opposite ends of the screen into a shared ocean. When your sho
 
 Track your total score, accuracy percentage, best single catch, and a gallery of every creature you caught during the round.
 
-![Score screen](screenshots/score-screen.png)
+![Score screen](assets/screenshots/ss3.png)
 
 ## Getting Started
 
@@ -92,7 +111,7 @@ The game auto-deploys to GitHub Pages on push to `main` via the included workflo
 
 ## Project Structure
 
-```
+```dir
 js/
 ├── main.js                  # Entry point, canvas setup, responsive scaling
 ├── game.js                  # Fixed-timestep game loop (60 FPS)
